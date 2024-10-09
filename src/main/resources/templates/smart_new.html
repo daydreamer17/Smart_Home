@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Home System</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="/css/style_new.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+
+<div class="xtx_topnav">
+    <div class="wrapper">
+
+        <ul class="xtx_navs">
+            <li>
+                <a href="/api/main">HomePage</a>
+            </li>
+            <li>
+                <a href="/api/login_temp">log in</a>
+            </li>
+            <li>
+                <a href="./register.html">Registration</a>
+            </li>
+            <li>
+                <a href="./center-order.html">My Orders</a>
+            </li>
+            <li>
+                <a href="./center.html">Member Centre</a>
+            </li>
+            <li>
+                <a href="javascript:;">Help Centre</a>
+            </li>
+            <li>
+                <a href="javascript:;">Online Customer Service</a>
+            </li>
+            <li>
+                <a href="javascript:;">
+                    <i class="mobile sprites"></i>
+                    mobile
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div id="app">
+    <h1>Smart Home Control Panel</h1>
+
+    <!-- Monitoring Module -->
+    <div class="module-container">
+        <h2 class="section-title">Monitoring Module</h2>
+        <div class="container">
+            <!-- Temperature Monitoring Module -->
+            <div class="card">
+                <img src="/img/icon_temperature.png" alt="Thermostat Icon" class="icon">
+                <h2>Temperature</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="100" :color="temperatureColor" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ temperature }}°C</div>
+                </div>
+
+                <el-button type="primary" round @click="getTemperature">Getting the temperature</el-button>
+            </div>
+
+            <!-- Humidity Monitoring Module -->
+            <div class="card">
+                <img src="/img/icon_humidity.png" alt="Humidifier Icon" class="icon">
+                <h2>humidity level </h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="humidity" color="#409EFF" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ humidity }}%</div>
+                </div>
+                <el-button type="primary" round @click="getHumidity">Getting Humidity</el-button>
+            </div>
+
+            <!-- Smoke Monitoring Module -->
+            <div class="card">
+                <img src="/img/icon_smokeSensor.png" alt="Smoke Icon" class="icon">
+                <h2>Smoke</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="smokeLevel" color="#E6A23C" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ smokeLevel }}</div>
+                </div>
+                <el-button type="primary" round @click="getSmokeLevel">Get Smoke</el-button>
+            </div>
+
+            <!-- Light Monitoring Module -->
+            <div class="card">
+                <img src="/img/icon_light.png" alt="Light Icon" class="icon">
+                <h2>Light</h2>
+                <div class="progress-container">
+                    <el-progress
+                            type="circle"
+                            :percentage="100"
+                            color="#fddd8c"
+                            :show-text="false">
+                    </el-progress>
+                    <div class="progress-text">{{ lightLevel }}Lux</div> <!-- Centred display of light intensity data and units -->
+                </div>
+                <el-button type="primary" round @click="getLightLevel">Getting the Lights</el-button>
+            </div>
+
+            <!-- Precipitation Monitoring Module -->
+            <div class="card">
+                <img src="/img/icon_sprinkle.png" alt="Rain Icon" class="icon">
+                <h2>Precipitation</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="rainLevel" color="#409EFF" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ rainLevel }}mm</div>
+                </div>
+                <el-button type="primary" round @click="getRainLevel">Getting precipitation</el-button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- control module -->
+    <div class="module-container">
+        <h2 class="section-title">control module</h2>
+        <div class="container">
+            <!-- Door Control Module -->
+            <div class="control-card">
+                <img src="/img/icon_door.png" alt="Lock Icon" class="icon">
+                <div class="info">
+                    <h2>Door</h2>
+                    <el-switch v-model="doorStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleDoor"></el-switch>
+                </div>
+            </div>
+
+            <!-- Fan Control Module -->
+            <div class="control-card">
+                <img src="/img/icon_fan.png" alt="Fan Icon" class="icon">
+                <div class="info">
+                    <h2>Fan</h2>
+                    <el-switch v-model="fanStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleFan"></el-switch>
+                </div>
+            </div>
+
+            <!-- Window control module -->
+            <div class="control-card">
+                <img src="/img/icon_window.png" alt="Window Icon" class="icon">
+                <div class="info">
+                    <h2>Window</h2>
+                    <el-switch v-model="windowStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleWindow"></el-switch>
+                </div>
+            </div>
+            <!-- Garage door control module -->
+            <div class="control-card">
+                <img src="/img/icon_garageDoor.png" alt="Garage Door Icon" class="icon">
+                <div class="info">
+                    <h2>Garage door</h2>
+                    <el-switch v-model="garageDoorStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleGarage"></el-switch>
+                </div>
+            </div>
+
+            <!-- Lighting Control Module -->
+            <div class="control-card">
+                <img src="/img/icon_light.png" alt="Light Control Icon" class="icon">
+                <div class="info">
+                    <h2>Light</h2>
+
+                    <!-- Separate round button for colour switching -->
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <!-- red switch -->
+                        <el-button
+                                :style="{ backgroundColor: redStatus ? '#FF4D4F' : '#FF4D4F80', color: '#fff' }"
+                                size="medium"
+                                circle
+                                @click="toggleLight('red')">
+                        </el-button>
+
+                        <!-- Green Switch -->
+                        <el-button
+                                :style="{ backgroundColor: greenStatus ? '#52C41A' : '#52C41A80', color: '#fff' }"
+                                size="medium"
+                                circle
+                                @click="toggleLight('green')">
+                        </el-button>
+
+                        <!-- Blue Switch -->
+                        <el-button
+                                :style="{ backgroundColor: blueStatus ? '#1890FF' : '#1890FF80', color: '#fff' }"
+                                size="medium"
+                                circle
+                                @click="toggleLight('blue')">
+                        </el-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cat's Eye Control Module -->
+            <a href="http://172.20.10.2/mjpeg/1" target="_blank" style="text-decoration: none;">
+                <div class="control-card">
+                    <img src="/img/icon_security.png" alt="Peep Icon" class="icon">
+                    <div class="info">
+                        <h2 class="peep">peephole</h2>
+                    </div>
+                </div>
+            </a>
+
+
+
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                temperature: 24,
+                humidity: 0,
+                smokeLevel: 0,
+                lightLevel: 0,
+                rainLevel: 0,
+                doorStatus: false,
+                fanStatus: false,
+                windowStatus: false,
+                garageDoorStatus: false,
+                redStatus: false,
+                greenStatus: false,
+                blueStatus: false,
+            };
+        },
+        computed: {
+            temperatureColor() {
+                if (this.temperature >= 24 && this.temperature <= 27) return '#67C23A';
+                if ((this.temperature >= 20 && this.temperature <= 23) || (this.temperature >= 28 && this.temperature <= 30)) return '#E6A23C'; // 黄色
+                return '#F56C6C';
+            }
+        },
+        methods: {
+            getTemperature() {
+                $.ajax({
+                    url: '/api/temp-sensor/5',
+                    type: 'GET',
+                    success: (data) => {
+                        this.temperature = data?.data?.current_Temp || '--';
+                    },
+                    error: (error) => {
+                        console.error('Failed to get temperature:', error);
+                    }
+                });
+            },
+            getHumidity() {
+                $.ajax({
+                    url: '/api/humidity/5',
+                    type: 'GET',
+                    success: (data) => {
+                        this.humidity = data?.data?.humidity || '--';
+                    },
+                    error: (error) => {
+                        console.error('Failed to get humidity:', error);
+                    }
+                });
+            },
+            getSmokeLevel() {
+                $.ajax({
+                url: '/api/smoke/5',
+                type: 'GET',
+                success: (data) => {
+                    this.smokeLevel = data?.data?.smoke_value || '--';
+                },
+                error: (error) => {
+                    console.error('Failed to get smoke:', error);
+                }
+                });
+            },
+            getLightLevel() {
+                $.ajax({
+                url: '/api/light-brightness/5',
+                type: 'GET',
+                success: (data) => {
+                    this.lightLevel = data?.data?.brightness || '--';
+                },
+                error: (error) => {
+                    console.error('Failed to get brightness:', error);
+                }
+                });
+            },
+            getRainLevel() {
+                $.ajax({
+                url: '/api/soil/5',
+                type: 'GET',
+                success: (data) => {
+                    this.rainLevel = data?.data?.soil_value || '--';
+                },
+                error: (error) => {
+                    console.error('Failed to get soil:', error);
+                }
+                });
+            },
+
+            //
+            toggleLight(color) {
+                let apiUrl = '';
+                let lightStatus = false;
+
+                if (color === 'red') {
+
+                    this.redStatus = !this.redStatus;
+                    apiUrl = this.redStatus ? '/api/Red/open' : '/api/Red/close';
+                    lightStatus = this.redStatus;
+                } else if (color === 'green') {
+
+                    this.greenStatus = !this.greenStatus;
+                    apiUrl = this.greenStatus ? '/api/Green/open' : '/api/Green/close';
+                    lightStatus = this.greenStatus;
+                } else if (color === 'blue') {
+
+                    this.blueStatus = !this.blueStatus;
+                    apiUrl = this.blueStatus ? '/api/Blue/open' : '/api/Blue/close';
+                    lightStatus = this.blueStatus;
+                }
+
+
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { idLight: 1 },
+                    success: function () {
+                        alert(`${color.charAt(0).toUpperCase() + color.slice(1)}The lights${lightStatus ? 'are on' : 'are off'}`);
+                    },
+                    error: function (error) {
+                        console.error(`${lightStatus ? 'switch on' : 'switch off'}${color}failed:`, error);
+                    }
+                });
+            },
+
+
+
+            toggleDoor(status) {
+                const apiUrl = status ? '/api/door/open' : '/api/door/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { "idDOOR": 1 },
+                    success: function (data) {
+                        alert(status ? 'The door is open.' : 'The door is closed.');
+                    },
+                    error: function (error) {
+                        console.error(status ? 'Failed to open the door:' : 'Failure to close the door:', error);
+                    }
+                });
+            },
+            toggleWindow(status) {
+                const apiUrl = status ? '/api/window/open' : '/api/window/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { "idWINDOWS": 1 },
+                    success: function (data) {
+                        alert(status ? 'The window is open.' : 'The window is closed.');
+                    },
+                    error: function (error) {
+                        console.error(status ? 'Failed to open window:' : 'Failed to close window:', error);
+                    }
+                });
+            },
+
+            toggleFan(status) {
+                const apiUrl = status ? '/api/fan/open' : '/api/fan/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { "idFAN": 1 },
+                    success: function (data) {
+                        alert(status ? 'The fan is open' : 'The fan is closed');
+                    },
+                    error: function (error) {
+                        console.error(status ? 'Failed to open fan:' : 'Failed to close fan:', error);
+                    }
+                });
+            },
+            toggleGarage(status) {
+                const apiUrl = status ? '/api/garage/open' : '/api/garage/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    success: function (data) {
+                        alert(status ? 'The garage is open' : 'The garage is close');
+                    },
+                    error: function (error) {
+                        console.error(status ? 'Failed to open garage:' : 'Failed to close garage:', error);
+                    }
+                });
+            },
+
+        }
+    });
+</script>
+</body>
+</html>

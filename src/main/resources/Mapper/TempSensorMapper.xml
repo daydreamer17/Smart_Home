@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.infomation.Mapper.TempSensorMapper">
+    <insert id="insertTemperatureAndHumidity" parameterType="map">
+        INSERT INTO temp_sensor (Current_Temp, humidity)
+        VALUES (#{data.temperature}, #{data.humidity});
+    </insert>
+
+
+    <select id="getTempSensorById" parameterType="Integer" resultType="org.example.infomation.Bean.Temp_sensor">
+        SELECT Current_Temp
+        FROM temp_sensor
+        WHERE idTEMP_SENSOR = #{idTemp}
+    </select>
+
+    <select id="getHumidityById" parameterType="Integer" resultType="org.example.infomation.Bean.Temp_sensor">
+        SELECT humidity
+        FROM temp_sensor
+        WHERE idTEMP_SENSOR = #{idTemp}
+    </select>
+
+</mapper>

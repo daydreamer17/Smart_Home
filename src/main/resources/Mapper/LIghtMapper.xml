@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.infomation.Mapper.LightMapper">
+
+    <select id="getBrightnessByID" parameterType="Integer" resultType="org.example.infomation.Bean.Light">
+        SELECT idLIGHT, Brightness FROM light
+        WHERE idLIGHT = #{idLight}
+    </select>
+
+    <insert id="insertBrightness" parameterType="Integer">
+        INSERT INTO light (Brightness)
+        VALUES (#{Brightness});
+    </insert>
+
+</mapper>

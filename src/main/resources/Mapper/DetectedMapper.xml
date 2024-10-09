@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.infomation.Mapper.DetectedMapper">
+    <insert id="insertSmokeAndSoil" parameterType="map">
+        INSERT INTO detected (smoke_value, soil_value)
+        VALUES (#{data.smoke_value}, #{data.soil_value});
+    </insert>
+
+    <select id="getSmokeById" parameterType="Integer" resultType="org.example.infomation.Bean.Detected">
+        SELECT smoke_value
+        FROM detected
+        WHERE idDETECTED = #{idDetected}
+    </select>
+
+    <select id="getSoilById" parameterType="Integer" resultType="org.example.infomation.Bean.Detected">
+        SELECT soil_value
+        FROM detected
+        WHERE idDETECTED = #{idDetected}
+    </select>
+
+</mapper>

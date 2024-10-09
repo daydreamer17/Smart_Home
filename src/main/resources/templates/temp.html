@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能家居系统</title>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="/css/style_new.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<!-- 顶部导航 -->
+<div class="xtx_topnav">
+    <div class="wrapper">
+        <!-- 顶部导航 -->
+        <ul class="xtx_navs">
+            <li><a href="./login.html" v-text="texts.login"></a></li>
+            <li><a href="./register.html" v-text="texts.register"></a></li>
+            <li><a href="./center-order.html" v-text="texts.orders"></a></li>
+            <li><a href="./center.html" v-text="texts.memberCenter"></a></li>
+            <li><a href="javascript:;" v-text="texts.helpCenter"></a></li>
+            <li><a href="javascript:;" v-text="texts.customerService"></a></li>
+            <li><a href="javascript:;"><i class="mobile sprites"></i> <span v-text="texts.mobile"></span></a></li>
+            <li><a href="javascript:;" @click="toggleLanguage">{{ languageButtonText }}</a></li>
+        </ul>
+    </div>
+</div>
+<div id="app">
+    <h1 v-text="texts.controlPanel"></h1>
+
+    <!-- 监控模块 -->
+    <div class="module-container">
+        <h2 class="section-title">监控模块</h2>
+        <div class="container">
+            <!-- 温度监控模块 -->
+            <div class="card">
+                <img src="/img/icon_temperature.png" alt="Thermostat Icon" class="icon">
+                <h2 v-text="texts.temperature">温度</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="100" :color="temperatureColor" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ temperature }}°C</div>
+                </div>
+
+                <el-button type="primary" round @click="getTemperature" v-text="texts.getTemperature">获取温度</el-button>
+            </div>
+
+            <!-- 湿度监控模块 -->
+            <div class="card">
+                <img src="/img/icon_humidity.png" alt="Humidifier Icon" class="icon">
+                <h2>湿度</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="humidity" color="#409EFF" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ humidity }}%</div>
+                </div>
+                <el-button type="primary" round @click="getHumidity">获取湿度</el-button>
+            </div>
+
+            <!-- 烟雾监控模块 -->
+            <div class="card">
+                <img src="/img/icon_smokeSensor.png" alt="Smoke Icon" class="icon">
+                <h2>烟雾</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="smokeLevel" color="#E6A23C" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ smokeLevel }}</div>
+                </div>
+                <el-button type="primary" round @click="getSmokeLevel">获取烟雾</el-button>
+            </div>
+
+            <!-- 灯光监控模块 -->
+            <div class="card">
+                <img src="/img/icon_light.png" alt="Light Icon" class="icon">
+                <h2>灯光</h2>
+                <div class="progress-container">
+                    <el-progress
+                            type="circle"
+                            :percentage="100"
+                            color="#fddd8c"
+                            :show-text="false">
+                    </el-progress>
+                    <div class="progress-text">{{ lightLevel }}Lux</div> <!-- 居中显示光强数据及单位 -->
+                </div>
+                <el-button type="primary" round @click="getLightLevel">获取灯光</el-button>
+            </div>
+
+            <!-- 降水量监控模块 -->
+            <div class="card">
+                <img src="/img/icon_sprinkle.png" alt="Rain Icon" class="icon">
+                <h2>降水量</h2>
+                <div class="progress-container">
+                    <el-progress type="circle" :percentage="rainLevel" color="#409EFF" :show-text="false"></el-progress>
+                    <div class="progress-text">{{ rainLevel }}mm</div>
+                </div>
+                <el-button type="primary" round @click="getRainLevel">获取降水量</el-button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 控制模块 -->
+    <div class="module-container">
+        <h2 class="section-title">控制模块</h2>
+        <div class="container">
+            <!-- 门控制模块 -->
+            <div class="control-card">
+                <img src="/img/icon_door.png" alt="Lock Icon" class="icon">
+                <div class="info">
+                    <h2>门</h2>
+                    <el-switch v-model="doorStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleDoor"></el-switch>
+                </div>
+            </div>
+
+            <!-- 风扇控制模块 -->
+            <div class="control-card">
+                <img src="/img/icon_fan.png" alt="Fan Icon" class="icon">
+                <div class="info">
+                    <h2>风扇</h2>
+                    <el-switch v-model="fanStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleFan"></el-switch>
+                </div>
+            </div>
+
+            <!-- 窗控制模块 -->
+            <div class="control-card">
+                <img src="/img/icon_window.png" alt="Window Icon" class="icon">
+                <div class="info">
+                    <h2>窗</h2>
+                    <el-switch v-model="windowStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleWindow"></el-switch>
+                </div>
+            </div>
+            <!-- 车库门控制模块 -->
+            <div class="control-card">
+                <img src="/img/icon_garageDoor.png" alt="Garage Door Icon" class="icon">
+                <div class="info">
+                    <h2>车库门</h2>
+                    <el-switch v-model="garageDoorStatus" active-color="#67C23A" inactive-color="#F56C6C" @change="toggleGarage"></el-switch>
+                </div>
+            </div>
+
+            <!-- 灯光控制模块 -->
+            <div class="control-card">
+                <img src="/img/icon_light.png" alt="Light Control Icon" class="icon">
+                <div class="info">
+                    <h2>灯光</h2>
+
+                    <!-- 颜色切换独立圆形按钮 -->
+                    <div style="margin-top: 10px; display: flex; gap: 10px;">
+                        <!-- 红色开关 -->
+                        <el-button
+                                :style="{ backgroundColor: redStatus ? '#FF4D4F' : '#FF4D4F80', color: '#fff' }"
+                                size="medium"
+                                circle
+                                @click="toggleLight('red')">
+                        </el-button>
+
+                        <!-- 绿色开关 -->
+                        <el-button
+                                :style="{ backgroundColor: greenStatus ? '#52C41A' : '#52C41A80', color: '#fff' }"
+                                size="medium"
+                                circle
+                                @click="toggleLight('green')">
+                        </el-button>
+
+                        <!-- 蓝色开关 -->
+                        <el-button
+                                :style="{ backgroundColor: blueStatus ? '#1890FF' : '#1890FF80', color: '#fff' }"
+                                size="medium"
+                                circle
+                                @click="toggleLight('blue')">
+                        </el-button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 猫眼控制模块 -->
+            <a href="http://172.20.10.2/mjpeg/1" target="_blank" style="text-decoration: none;">
+                <div class="control-card">
+                    <img src="/img/icon_security.png" alt="Peep Icon" class="icon">
+                    <div class="info">
+                        <h2 class="peep">猫眼</h2>
+                    </div>
+                </div>
+            </a>
+
+
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                temperature: 24,
+                humidity: 0,
+                smokeLevel: 0,
+                lightLevel: 0,
+                rainLevel: 0,
+                doorStatus: false,
+                fanStatus: false,
+                windowStatus: false,
+                garageDoorStatus: false,
+                redStatus: false,    // 红色开关状态
+                greenStatus: false,  // 绿色开关状态
+                blueStatus: false,    // 蓝色开关状态
+
+                currentLanguage: 'zh',
+                // 多语言文本内容
+                languages: {
+                    zh: {
+                        login: "请先登录",
+                        register: "免费注册",
+                        orders: "我的订单",
+                        memberCenter: "会员中心",
+                        helpCenter: "帮助中心",
+                        customerService: "在线客服",
+                        mobile: "手机版",
+                        controlPanel: "智能家居控制面板",
+                        monitorModule: "监控模块",
+                        temperature: "温度",
+                        getTemperature: "获取温度"
+                    },
+                    en: {
+                        login: "Login",
+                        register: "Register",
+                        orders: "My Orders",
+                        memberCenter: "Member Center",
+                        helpCenter: "Help Center",
+                        customerService: "Customer Service",
+                        mobile: "Mobile",
+                        controlPanel: "Smart Home Control Panel",
+                        monitorModule: "Monitor Module",
+                        temperature: "Temperature",
+                        getTemperature: "Get Temperature"
+                    }
+                },
+                texts: {},
+                languageButtonText: 'English'
+            };
+        },
+        computed: {
+            temperatureColor() {
+                if (this.temperature >= 24 && this.temperature <= 27) return '#67C23A'; // 绿色
+                if ((this.temperature >= 20 && this.temperature <= 23) || (this.temperature >= 28 && this.temperature <= 30)) return '#E6A23C'; // 黄色
+                return '#F56C6C'; // 红色
+            }
+        },
+        methods: {
+            getTemperature() {
+                $.ajax({
+                    url: '/api/temp-sensor/5',  // 替换成实际的传感器 ID
+                    type: 'GET',
+                    success: (data) => {
+                        this.temperature = data?.data?.current_Temp || '--';
+                    },
+                    error: (error) => {
+                        console.error('获取温度失败:', error);
+                    }
+                });
+            },
+            getHumidity() {
+                $.ajax({
+                    url: '/api/humidity/5',  // 替换成实际的传感器 ID
+                    type: 'GET',
+                    success: (data) => {
+                        this.humidity = data?.data?.humidity || '--';
+                    },
+                    error: (error) => {
+                        console.error('获取温度失败:', error);
+                    }
+                });
+            },
+            getSmokeLevel() {
+                $.ajax({
+                    url: '/api/smoke/5',  // 替换成实际的传感器 ID
+                    type: 'GET',
+                    success: (data) => {
+                        this.smokeLevel = data?.data?.smoke_value || '--';
+                    },
+                    error: (error) => {
+                        console.error('获取温度失败:', error);
+                    }
+                }); // 示例烟雾浓度
+            },
+            getLightLevel() {
+                $.ajax({
+                    url: '/api/light-brightness/5',  // 替换成实际的传感器 ID
+                    type: 'GET',
+                    success: (data) => {
+                        this.lightLevel = data?.data?.brightness || '--';
+                    },
+                    error: (error) => {
+                        console.error('获取温度失败:', error);
+                    }
+                });
+            },
+            getRainLevel() {
+                $.ajax({
+                    url: '/api/soil/5',  // 替换成实际的传感器 ID
+                    type: 'GET',
+                    success: (data) => {
+                        this.rainLevel = data?.data?.soil_value || '--';
+                    },
+                    error: (error) => {
+                        console.error('获取降水量失败:', error);
+                    }
+                });
+            },
+
+
+            toggleLanguage() {
+                this.currentLanguage = this.currentLanguage === 'zh' ? 'en' : 'zh';
+                this.updateTexts();
+                this.languageButtonText = this.currentLanguage === 'zh' ? 'English' : '中文';
+            },
+            updateTexts() {
+                this.texts = this.languages[this.currentLanguage];
+            },
+
+            //
+            toggleLight(color) {
+                let apiUrl = '';
+                let lightStatus = false;
+
+                if (color === 'red') {
+                    // 红灯开关
+                    this.redStatus = !this.redStatus;
+                    apiUrl = this.redStatus ? '/api/Red/open' : '/api/Red/close';
+                    lightStatus = this.redStatus;
+                } else if (color === 'green') {
+                    // 绿灯开关
+                    this.greenStatus = !this.greenStatus;
+                    apiUrl = this.greenStatus ? '/api/Green/open' : '/api/Green/close';
+                    lightStatus = this.greenStatus;
+                } else if (color === 'blue') {
+                    // 蓝灯开关
+                    this.blueStatus = !this.blueStatus;
+                    apiUrl = this.blueStatus ? '/api/Blue/open' : '/api/Blue/close';
+                    lightStatus = this.blueStatus;
+                }
+
+                // 发送请求到相应 API 端点
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { idLight: 1 },
+                    success: function () {
+                        alert(`${color.charAt(0).toUpperCase() + color.slice(1)}灯已${lightStatus ? '打开' : '关闭'}`);
+                    },
+                    error: function (error) {
+                        console.error(`${lightStatus ? '打开' : '关闭'}${color}灯失败:`, error);
+                    }
+                });
+            },
+
+
+
+            toggleDoor(status) {
+                const apiUrl = status ? '/api/door/open' : '/api/door/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { "idDOOR": 1 },
+                    success: function (data) {
+                        alert(status ? '门已打开' : '门已关闭');
+                    },
+                    error: function (error) {
+                        console.error(status ? '打开门失败:' : '关闭门失败:', error);
+                    }
+                });
+            },
+            toggleWindow(status) {
+                const apiUrl = status ? '/api/window/open' : '/api/window/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { "idWINDOWS": 1 },
+                    success: function (data) {
+                        alert(status ? '窗已打开' : '窗已关闭');
+                    },
+                    error: function (error) {
+                        console.error(status ? '打开窗失败:' : '关闭窗失败:', error);
+                    }
+                });
+            },
+
+            toggleFan(status) {
+                const apiUrl = status ? '/api/fan/open' : '/api/fan/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    data: { "idFAN": 1 },
+                    success: function (data) {
+                        alert(status ? '风扇已打开' : '风扇已关闭');
+                    },
+                    error: function (error) {
+                        console.error(status ? '打开风扇失败:' : '关闭风扇失败:', error);
+                    }
+                });
+            },
+            toggleGarage(status) {
+                const apiUrl = status ? '/api/garage/open' : '/api/garage/close';
+                $.ajax({
+                    url: apiUrl,
+                    type: 'POST',
+                    success: function (data) {
+                        alert(status ? '车库门已打开' : '车库门已关闭');
+                    },
+                    error: function (error) {
+                        console.error(status ? '打开车库门失败:' : '关闭车库门失败:', error);
+                    }
+                });
+            },
+
+
+            created() {
+                this.updateTexts();  // 初始化时根据当前语言设置文本
+            }
+
+        }
+    });
+</script>
+</body>
+</html>

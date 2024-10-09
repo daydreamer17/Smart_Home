@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.infomation.Mapper.DoorMapper">
+
+    <select id="getDoorById" parameterType="Integer" resultType="org.example.infomation.Bean.Door">
+        SELECT Status FROM door WHERE idDOOR = #{idDoor}
+    </select>
+
+    <update id="updateDoorStatus">
+        UPDATE DOOR
+        SET Status = #{status}
+        WHERE idDOOR = #{idDOOR}
+    </update>
+
+
+</mapper>
